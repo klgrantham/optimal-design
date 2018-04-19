@@ -8,6 +8,7 @@ library(plyr)
 library(dplyr)
 library(ggplot2)
 library(ltsa)
+library(numbers)
 
 desmat <- function(Tp, nclust){
   Xcrxo <- matrix(data=0, ncol=Tp, nrow=nclust)
@@ -50,100 +51,83 @@ vartheta <- function(Xmat, Vi_inv) {
   return(var)
 }
 
-# TODO: Probably need to have input be number of subjects in a cluster (N/2 here)
-# OR Redefine N to be number of subjects in a cluster?
-contdecayVi <- function(r, N, rho0){
+contdecayVi <- function(r, M, rho0){
   # Constructs the covariance matrix for a single cluster, under the
   # continuous time decay model for a given total number of subjects
   #
   # Inputs:
   # r - 1-rate of decay over entire trial
-  # N - total number of subjects each cluster
+  # M - total number of subjects each cluster
   # rho0 - base correlation between subjects measured at same time
   
   totalvar <- 1
   sig2CP <- rho0*totalvar
   sig2E <- totalvar - sig2CP
-  Vi <- diag(sig2E,N) +
-        sig2CP*(r^(abs(matrix(rep(1:N), nrow=N, ncol=N, byrow=FALSE) -
-                       matrix(rep(1:N), nrow=N, ncol=N, byrow=TRUE))/N))
+  Vi <- diag(sig2E,M) +
+        sig2CP*(r^(abs(matrix(rep(1:M), nrow=M, ncol=M, byrow=FALSE) -
+                       matrix(rep(1:M), nrow=M, ncol=M, byrow=TRUE))/M))
   return(Vi)
 }
-
-# Fixed total number of subjects
-N <- 800
-# Set rate of decay (1-r)
-r <- 0.8
-
-## Candidate trial configurations
-# Trial A: 2 periods, 400 subjects in each
-TpA <- 2; mA <- N/TpA
-# Trial B: 4 periods, 200 subjects in each
-TpB <- 4; mB <- N/TpB
-# Trial C: 8 periods, 100 subjects in each
-TpC <- 8; mC <- N/TpC
-# Trial D: 16 periods, 50 subjects in each
-TpD <- 16; mD <- N/TpD
-# Trial E: 32 periods, 25 subjects in each
-TpE <- 32; mE <- N/TpE
-
-allTp <- c(TpA, TpB, TpC, TpD, TpE)
-
-# Generate design matrices
-XmatA <- desmat(Tp=TpA, nclust=2)
-XmatB <- desmat(Tp=TpB, nclust=2)
-XmatC <- desmat(Tp=TpC, nclust=2)
-XmatD <- desmat(Tp=TpD, nclust=2)
-XmatE <- desmat(Tp=TpE, nclust=2)
-Xmats <- list(XmatA, XmatB, XmatC, XmatD, XmatE)
-
-# Generate covariance matrix for a cluster
-V <- contdecayVi(r=r, N=N, rho0=0.04)
-
-# Calculate variance of treatment effect estimators
-allvar <- vartheta_ind_vec(V, Xmats)
-
-plot(allTp, allvar, type='l')
-
-
-# Hypothesis: minimum variance achieved when T=Tm (1 subject in each period)
-N <- 800
-TpZ <- N
-mZ <- N/TpZ
-XmatZ <- desmat(Tp=TpZ, nclust=2)
-V <- contdecayVi(r=r, N=N, rho0=0.04)
-varZ <- vartheta_ind_vec(Vi=V, Xmat=list(XmatZ))
-plot(c(allTp, TpZ), c(allvar, varZ), type='l')
-
-allvar[5]; varZ
-(varZ - allvar[5])/allvar[5] # For r=0.8, T=32 vs 800, only a 0.29% decrease in variance
 
 
 ## For different rates of decay, how different are the
 ## gains in precision going from T=2 to T=4?
 
-vars_doubling <- function(rs, N){
+vars_doubling <- function(rs, M){
   Xmats <- list(desmat(2,2), desmat(4,2), desmat(8,2), desmat(16,2), desmat(32,2))
-  ctvarmat <- llply(rs, contdecayVi, N, 0.035)
+  ctvarmat <- llply(rs, contdecayVi, M, 0.035)
   ctres <- laply(ctvarmat, vartheta_ind_vec, Xmat=Xmats)
   varvals <- data.frame(decay=1-rs, varT2=ctres[,1], varT4=ctres[,2],
                         varT8=ctres[,3], varT16=ctres[,4], varT32=ctres[,5])
   return(varvals)
 }
 
-res <- vars_doubling(rs=seq(0.5,1,0.01), N=800)
-gains <- res %>%
-          mutate(ratio4to2=varT4/varT2, ratio8to2=varT8/varT2,
-          ratio16to2=varT16/varT2, ratio32to2=varT32/varT2) %>%
-          select(decay, starts_with('ratio'))
-gains_long <- gather(data=gains, key=comparison, value=relative_variance,
-                      ratio4to2:ratio32to2, convert=TRUE)
+optimal_T <- function(r, rho0, M){
+  # Returns optimal number of periods (giving lowest variance)
+  # for specified correlation values and number of subjects
+  # in a cluster. Assumes two clusters.
+  
+  d <- divisors(M)
+  # Take only T>=2 from divisors of M
+  Tps <- d[which(d>=2)]
+  # Generate covariance matrix for a cluster
+  V <- contdecayVi(r=r, rho0=rho0, M=M)
+  # Generate design matrices for all values of T
+  Xmats <- llply(Tps, desmat, 2)
+  vars <- vartheta_ind_vec(V, Xmats)
+  results <- data.frame(Tp=Tps, variance=vars)
+  optimal <- results[which.min(results$variance),]
+  return(list(opt=optimal, all=results))
+}
 
-p <- ggplot(data=gains_long, aes(x=decay, y=relative_variance, group=comparison, color=comparison)) +
-  geom_line(size=2.0) +
-  geom_hline(yintercept=1.0, size=1.0, color="black", linetype="longdash") +
-  expand_limits(y=c(0,1)) +
-  xlab("Decay over trial") +
-  ylab("Variance ratio") +
-  theme_bw() +
-  theme(axis.title=element_text(size=20), axis.text=element_text(size=20))
+optimal_N_T <- function(r, rho0, NTm){
+  # Returns optimal number of clusters and periods
+  # (giving lowest variance) for specified correlation values,
+  # number of subjects in trial.
+
+  d <- divisors(NTm)
+  # Take only even N values from divisors of NTm
+  Ns <- d[which(d %% 2 == 0 & d != NTm)]
+  res <- list()
+  for (i in 1:length(Ns)) {
+    N <- Ns[i]
+    M <- NTm/N
+    V <- contdecayVi(r=r, rho0=rho0, M=M)
+    # Must have T>=2 and m>=1
+    # Possible values of T will be all divisors of each M except 1
+    dM <- divisors(M)
+    Tps <- dM[dM != 1]
+    Xmats <- llply(Tps, desmat, N)
+    vars <- vartheta_ind_vec(V, Xmats)
+    res[[i]] <- cbind(rep(N, length(Tps)), Tps, vars)
+  }
+  resblock <- do.call("rbind", res)
+  results <- data.frame(N=resblock[,1], T=resblock[,2], variance=resblock[,3])
+  optimal <- results[which.min(results$variance),]
+  return(list(opt=optimal, all=results))
+}
+
+total_cost <- function(N, Tp, NTm, c, s, x){
+  B <- N*c + (NTm)*s + N*(Tp-1)*x
+  return(B)
+}
