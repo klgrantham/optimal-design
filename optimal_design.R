@@ -69,7 +69,6 @@ contdecayVi <- function(r, M, rho0){
   return(Vi)
 }
 
-
 ## For different rates of decay, how different are the
 ## gains in precision going from T=2 to T=4?
 
@@ -82,10 +81,10 @@ vars_doubling <- function(rs, M){
   return(varvals)
 }
 
-optimal_T <- function(r, rho0, M){
+optimal_T <- function(r, rho0, M, N){
   # Returns optimal number of periods (giving lowest variance)
-  # for specified correlation values and number of subjects
-  # in a cluster. Assumes two clusters.
+  # for specified correlation values, number of subjects
+  # in a cluster, M, and number of clusters, N (even).
   
   d <- divisors(M)
   # Take only T>=2 from divisors of M
@@ -93,7 +92,7 @@ optimal_T <- function(r, rho0, M){
   # Generate covariance matrix for a cluster
   V <- contdecayVi(r=r, rho0=rho0, M=M)
   # Generate design matrices for all values of T
-  Xmats <- llply(Tps, desmat, 2)
+  Xmats <- llply(Tps, desmat, N)
   vars <- vartheta_ind_vec(V, Xmats)
   results <- data.frame(Tp=Tps, variance=vars)
   optimal <- results[which.min(results$variance),]
