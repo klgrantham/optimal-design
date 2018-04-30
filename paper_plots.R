@@ -340,3 +340,55 @@ p <- ggplot(data=vars_long, aes(x=Tp, y=variance, group=decayrate, color=decayra
   scale_y_continuous(limits=c(0,0.003))
 ggsave("plots/var_Tm5000_N2_r50_75_90_rho035.jpg", p, width=9, height=7, units="in", dpi=600)
 ggsave("plots/var_Tm5000_N2_r50_75_90_rho035.pdf", p, width=9, height=7, units="in", dpi=600)
+
+# Plot of variance versus T for Hussey & Hughes model (r=1)
+load("results/all_Tm_5000_r_100_rho_035.Rda"); res0N2 <- all
+
+title <- expression(paste("Variance of treatment effect estimators, ", var(hat(theta)), " Hussey & Hughes"))
+subtitle <- bquote(paste("Two clusters, 5,000 subjects in each cluster, ", rho[0]==0.035))
+
+p <- ggplot(data=res0N2, aes(x=Tp, y=variance, color="lightblue")) +
+  geom_line(size=2.0) +
+  geom_point(size=2.5) +
+  xlab("T (number of periods)") +
+  ylab("Variance") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16),
+        legend.position="bottom") +
+  scale_x_log10(breaks=c(2,4,5,8,10,20,50,100,200,500,1000,2500,5000), minor_breaks=NULL) +
+  scale_y_continuous(limits=c(0,0.003))
+ggsave("plots/var_HH_Tm5000_N2_r50_75_90_rho035.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/var_HH_Tm5000_N2_r50_75_90_rho035.pdf", p, width=9, height=7, units="in", dpi=600)
+
+# Plot of variance versus T for several decay rates (including no decay (r=1))
+vars <- data.frame(Tp=res25N2$Tp, decay0=res0N2$variance, decay25=res25N2$variance,
+                   decay10=res10N2$variance, decay50=res50N2$variance)
+vars_long <- vars %>%
+  gather(key=decayrate, value=variance, -Tp, convert=TRUE)
+
+title <- expression(paste("Variance of treatment effect estimators, ", var(hat(theta))))
+subtitle <- bquote(paste("Two clusters, 5,000 subjects in each cluster, ", rho[0]==0.035))
+
+p <- ggplot(data=vars_long, aes(x=Tp, y=variance, group=decayrate, color=decayrate)) +
+  geom_line(size=2.0) +
+  geom_point(size=2.5) +
+  scale_color_manual(values=colorRampPalette(c("lightblue", "darkblue"))(4),
+                     name="Correlation decay over trial",
+                     labels=c("0%", "10%", "25%", "50%")) +
+  xlab("T (number of periods)") +
+  ylab("Variance") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16),
+        legend.position="bottom") +
+  scale_x_log10(breaks=c(2,4,5,8,10,20,50,100,200,500,1000,2500,5000), minor_breaks=NULL) +
+  scale_y_continuous(limits=c(0,0.003))
+ggsave("plots/var_Tm5000_N2_r50_75_90_100_rho035.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/var_Tm5000_N2_r50_75_90_100_rho035.pdf", p, width=9, height=7, units="in", dpi=600)
