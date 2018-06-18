@@ -126,7 +126,41 @@ optimal_N_T <- function(r, rho0, NTm){
   return(list(opt=optimal, all=results))
 }
 
-total_cost <- function(N, Tp, NTm, c, s, x){
-  B <- N*c + (NTm)*s + N*(Tp-1)*x
+total_cost <- function(N, Tp, M, c, s, x){
+  B <- N*c + (N*M)*s + N*(Tp-1)*x
   return(B)
+}
+
+optimal_N_T_fixedM <- function(r, rho0, M, maxN, B, c, s, x){
+  # Returns optimal number of clusters and periods
+  # (giving lowest variance) for given:
+  #   - correlation values
+  #   - total trial budget
+  #   - cluster cost
+  #   - subject cost
+  #   - crossover cost
+  #   - number of subjects per cluster
+  #   _ maximum number of clusters
+  
+  Ns <- seq(2, maxN, 2) # all possible numbers of clusters
+  dM <- divisors(M)
+  Tps <- dM[dM %% 2 == 0] # all even divisors of M
+  # Determine combinations of N and T that stay within budget
+  all <- data.frame(N=rep(Ns, each=length(Tps)), Tp=rep(Tps, times=length(Ns)), cost=NA)
+  for (i in 1:dim(all)[1]){
+    all$cost[i] <- total_cost(all$N[i], all$Tp[i], M, c, s, x)
+  }
+  if(sum(all$cost <= B) == 0){
+    stop('No admissible designs within budget')
+  }else{
+    underbudget <- all[all$cost <= B,]
+    V <- contdecayVi(r=r, rho0=rho0, M=M)
+    Xmats <- list()
+    for (i in 1:dim(underbudget)[1]){
+      Xmats[[i]] <- desmat(underbudget$Tp[i], underbudget$N[i])
+    }
+    vars <- vartheta_ind_vec(V, Xmats)
+    underbudget$variance <- vars
+    return(underbudget)
+  }
 }
