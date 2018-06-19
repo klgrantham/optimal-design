@@ -6,6 +6,7 @@
 library(shiny)
 library(plotly)
 library(scales)
+library(DT)
 
 source('optimal_design.R')
 
@@ -16,44 +17,35 @@ shinyServer(function(input, output) {
     res <- optimal_N_T_fixedM(r=1-input$d, rho0=input$rho0, M=input$M,
                               maxN=input$maxN, B=input$B, c=input$c,
                               s=input$s, x=input$x)
+    res$N <- as.integer(res$N)
+    res$Tp <- as.integer(res$Tp)
+    res$releff <- min(res$variance)/res$variance
+    res$releff <- as.numeric(format(res$releff, digits=3))
+    res$variance <- as.numeric(format(res$variance, digits=3))
     return(res)
   })
   
-  output$tableheader1 <- eventReactive(input$update, {
-    header1()
-  })
-  
-  header1 <- renderPrint({
-    tags$h3("Optimal configuration")
-  })
-  
-  output$optimal <- renderTable({
+  output$plot1 <- renderPlotly({
     res <- getresults()
-    res$N <- as.integer(res$N)
-    res$Tp <- as.integer(res$Tp)
-    res$cost <- paste0("$", comma(res$cost))
-    opt <- res[which.min(res$variance),]
-    opt$variance <- format(opt$variance, digits=3)
-    names(opt) <- c("N", "T", "Cost", "Variance")
-    return(opt)
+    p <- plot_ly(res, height=800, x=~Tp, y=~N, 
+                 type="scatter", mode="markers", hoverinfo="text",
+#                 hoverlabel=list(bordercolor=NULL, font=list(size=16)),
+                 text=~paste("T: ", Tp, "<br>N: ", N,
+                             "<br>Relative efficiency: ", format(releff, digits=3),
+                             "<br>Cost: ", paste0("$", comma(cost))),
+                 color=~releff, marker=list(size=14)) %>%
+         layout(xaxis=list(title="Number of periods (T)", titlefont=list(size=18), tickfont=list(size=16)),
+                yaxis=list(title="Number of clusters (N)", titlefont=list(size=18), tickfont=list(size=16)))
+    p$elementId <- NULL # Workaround to suppress warning due to an incompatility between shiny and plotly
+    p
   })
-  
-  output$tableheader2 <- eventReactive(input$update, {
-    header2()
-  })
-  
-  header2 <- renderPrint({
-    tags$h3("All admissible designs")
-  })
-  
-  output$results <- renderTable({
-    res <- getresults()
-    res$N <- as.integer(res$N)
-    res$Tp <- as.integer(res$Tp) 
-    res$cost <- paste0("$", comma(res$cost))
-    ressorted <- res[order(res$variance),]
-    ressorted$variance <- format(ressorted$variance, digits=3)
-    names(ressorted) <- c("N", "T", "Cost", "Variance")
-    return(ressorted)
-  })
+
+  output$dtresults <- DT::renderDataTable(
+    DT::datatable(getresults(), options=list(
+      searching=FALSE, paging=FALSE,
+      order=list(3, 'asc'),
+      columnDefs=list(list(targets=2, class="dt-right"))),
+      colnames=c("N", "T", "Cost", "Variance", "Relative efficiency"),
+      rownames=FALSE)
+  )
 })
