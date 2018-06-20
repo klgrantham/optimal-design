@@ -87,16 +87,19 @@ optimal_T <- function(r, rho0, M, N){
   # in a cluster, M, and number of clusters, N (even).
   
   d <- divisors(M)
-  # Take only T>=2 from divisors of M
-  Tps <- d[which(d>=2)]
+  # Take only even T>=2 from divisors of M
+  Tps <- d[d>=2 & d %% 2 == 0]
   # Generate covariance matrix for a cluster
   V <- contdecayVi(r=r, rho0=rho0, M=M)
   # Generate design matrices for all values of T
   Xmats <- llply(Tps, desmat, N)
   vars <- vartheta_ind_vec(V, Xmats)
-  results <- data.frame(Tp=Tps, variance=vars)
-  optimal <- results[which.min(results$variance),]
-  return(list(opt=optimal, all=results))
+  all <- data.frame(Tp=Tps, variance=vars)
+  if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
+  rho0char <- strsplit(as.character(rho0),"\\.")[[1]][2]
+  save(all, file=paste0("results/all_M_", M, "_N_", N, "_r_", rchar, "_rho_", rho0char, ".Rda"))
+  optimal <- all[which.min(all$variance),]
+  return(list(opt=optimal, all=all))
 }
 
 optimal_N_T <- function(r, rho0, NTm){
@@ -112,18 +115,21 @@ optimal_N_T <- function(r, rho0, NTm){
     N <- Ns[i]
     M <- NTm/N
     V <- contdecayVi(r=r, rho0=rho0, M=M)
-    # Must have T>=2 and m>=1
+    # Must have even T>=2 and m>=1
     # Possible values of T will be all divisors of each M except 1
     dM <- divisors(M)
-    Tps <- dM[dM != 1]
+    Tps <- dM[dM != 1 & dM %% 2 == 0]
     Xmats <- llply(Tps, desmat, N)
     vars <- vartheta_ind_vec(V, Xmats)
     res[[i]] <- cbind(rep(N, length(Tps)), Tps, vars)
   }
   resblock <- do.call("rbind", res)
-  results <- data.frame(N=resblock[,1], T=resblock[,2], variance=resblock[,3])
-  optimal <- results[which.min(results$variance),]
-  return(list(opt=optimal, all=results))
+  all <- data.frame(N=resblock[,1], T=resblock[,2], variance=resblock[,3])
+  if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
+  rho0char <- strsplit(as.character(rho0),"\\.")[[1]][2]
+  save(all, file=paste0("results/all_NTm_", NTm, "_r_", rchar, "_rho_", rho0char, ".Rda"))
+  optimal <- all[which.min(all$variance),]
+  return(list(opt=optimal, all=all))
 }
 
 total_cost <- function(N, Tp, M, c, s, x){
