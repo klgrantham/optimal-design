@@ -6,7 +6,7 @@
 source('optimal_design.R')
 
 # Load results from NTm=10,000
-load('results/all_NTm_10000_r_75_rho_035.Rda'); res <- all
+load('results/all_NTm_10000_r_75_rho_036.Rda'); res <- all
 load('results/all_NTm_10000_r_50_rho_035.Rda'); res50 <- all
 load('results/all_NTm_10000_r_90_rho_035.Rda'); res10 <- all
 
@@ -19,7 +19,7 @@ res$releffcat4 <- gsub("\\(|\\]|\\[", "", newcats)
 color_paletteYGDB <-colorRampPalette(c( "yellow", "green", "darkblue"))(6)
 
 title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
-subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.75, " , ", rho[0]==0.035))
+subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.75, " , ", rho[0]==0.036))
 
 p <- ggplot(res, aes(x=T, y=N, color=factor(releffcat4))) +
   geom_point(shape=16, size=5) +
@@ -35,8 +35,8 @@ p <- ggplot(res, aes(x=T, y=N, color=factor(releffcat4))) +
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
   scale_x_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL) +
   scale_y_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL)
-ggsave("plots/rel_eff_NTm10000_r75_rho035.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_NTm10000_r75_rho035.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r75_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r75_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
 
 # Relative efficiency for 50% decay over trial
 res50$releff <- min(res50$variance)/res50$variance
