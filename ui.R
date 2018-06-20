@@ -74,7 +74,10 @@ shinyUI(fluidPage(
     mainPanel(
       
       tabsetPanel(
-        tabPanel("Relative efficiency", plotlyOutput("plot1")),
+        tabPanel("Relative efficiency",
+                 checkboxInput('logscale', "Display x-axis on log scale"),
+                 plotlyOutput("plot1")),
+        
         tabPanel("Results table", DT::dataTableOutput("dtresults"))
       )
     )

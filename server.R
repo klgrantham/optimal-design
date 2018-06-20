@@ -27,6 +27,11 @@ shinyServer(function(input, output) {
   
   output$plot1 <- renderPlotly({
     res <- getresults()
+    if (input$logscale){
+      type <- "log"
+    }else{
+      type <- "-"
+    }
     p <- plot_ly(res, height=800, x=~Tp, y=~N, 
                  type="scatter", mode="markers", hoverinfo="text",
 #                 hoverlabel=list(bordercolor=NULL, font=list(size=16)),
@@ -34,7 +39,7 @@ shinyServer(function(input, output) {
                              "<br>Relative efficiency: ", format(releff, digits=3),
                              "<br>Cost: ", paste0("$", comma(cost))),
                  color=~releff, marker=list(size=14)) %>%
-         layout(xaxis=list(title="Number of periods (T)", titlefont=list(size=18), tickfont=list(size=16)),
+         layout(xaxis=list(title="Number of periods (T)", titlefont=list(size=18), tickfont=list(size=16), type=type),
                 yaxis=list(title="Number of clusters (N)", titlefont=list(size=18), tickfont=list(size=16)))
     p$elementId <- NULL # Workaround to suppress warning due to an incompatility between shiny and plotly
     p
