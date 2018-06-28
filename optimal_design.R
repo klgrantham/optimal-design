@@ -115,10 +115,10 @@ optimal_N_T <- function(r, rho0, NTm){
     N <- Ns[i]
     M <- NTm/N
     V <- contdecayVi(r=r, rho0=rho0, M=M)
-    # Must have even T>=2 and m>=1
-    # Possible values of T will be all divisors of each M except 1
+    # Must have even T>=2 even and m>=1
+    # Possible values of T will be all even divisors of each M
     dM <- divisors(M)
-    Tps <- dM[dM != 1 & dM %% 2 == 0]
+    Tps <- dM[dM %% 2 == 0]
     Xmats <- llply(Tps, desmat, N)
     vars <- vartheta_ind_vec(V, Xmats)
     res[[i]] <- cbind(rep(N, length(Tps)), Tps, vars)

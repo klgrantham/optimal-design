@@ -7,8 +7,8 @@ source('optimal_design.R')
 
 # Load results from NTm=10,000
 load('results/all_NTm_10000_r_75_rho_036.Rda'); res <- all
-load('results/all_NTm_10000_r_50_rho_035.Rda'); res50 <- all
-load('results/all_NTm_10000_r_90_rho_035.Rda'); res10 <- all
+load('results/all_NTm_10000_r_5_rho_036.Rda'); res50 <- all
+load('results/all_NTm_10000_r_9_rho_036.Rda'); res10 <- all
 
 # Relative efficiency for 25% decay over trial
 res$releff <- min(res$variance)/res$variance
@@ -47,7 +47,7 @@ res50$releffcat <- gsub("\\(|\\]|\\[", "", newcats)
 color_paletteYGDB <-colorRampPalette(c( "yellow", "green", "darkblue"))(6)
 
 title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
-subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.50, " , ", rho==0.035))
+subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.50, " , ", rho==0.036))
 
 p <- ggplot(res50, aes(x=T, y=N, color=factor(releffcat))) +
   geom_point(shape=16, size=5) +
@@ -63,8 +63,8 @@ p <- ggplot(res50, aes(x=T, y=N, color=factor(releffcat))) +
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
   scale_x_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL) +
   scale_y_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL)
-ggsave("plots/rel_eff_NTm10000_r50_rho035.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_NTm10000_r50_rho035.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r50_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r50_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
 
 # Relative efficiency for 10% decay over trial
 res10$releff <- min(res10$variance)/res10$variance
@@ -75,7 +75,7 @@ res10$releffcat <- gsub("\\(|\\]|\\[", "", newcats)
 color_paletteYGDB <- colorRampPalette(c( "yellow", "green", "darkblue"))(6)
 
 title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
-subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.90, " , ", rho==0.035))
+subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.90, " , ", rho==0.036))
 
 p <- ggplot(res10, aes(x=T, y=N, color=factor(releffcat))) +
   geom_point(shape=16, size=5) +
@@ -91,8 +91,39 @@ p <- ggplot(res10, aes(x=T, y=N, color=factor(releffcat))) +
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
   scale_x_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL) +
   scale_y_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL)
-ggsave("plots/rel_eff_NTm10000_r90_rho035.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_NTm10000_r90_rho035.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r90_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r90_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+
+
+# Relative efficiency for 25% decay over trial and rho=0.1
+load('results/all_NTm_10000_r_75_rho_1.Rda'); res25rho1 <- all
+
+res25rho1$releff <- min(res25rho1$variance)/res25rho1$variance
+cats <- cut(res25rho1$releff, breaks=c(0,0.5,0.8,0.9,0.95,0.99,1),
+            include.lowest=TRUE)
+newcats <- gsub(",", "-", cats, fixed=TRUE)
+res25rho1$releffcat <- gsub("\\(|\\]|\\[", "", newcats)
+color_paletteYGDB <- colorRampPalette(c( "yellow", "green", "darkblue"))(6)
+
+title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
+subtitle <- bquote(paste("10,000 subjects in trial, ", r==0.75, " , ", rho==0.1))
+
+p <- ggplot(res25rho1, aes(x=T, y=N, color=factor(releffcat))) +
+  geom_point(shape=16, size=5) +
+  scale_color_manual(values=color_paletteYGDB,
+                     name="Relative efficiency") +
+  xlab("T (number of periods)") +
+  ylab("N (number of clusters)") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16)) +
+  scale_x_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL) +
+  scale_y_log10(breaks=c(2,10,100,1000,5000), minor_breaks=NULL)
+ggsave("plots/rel_eff_NTm10000_r75_rho1.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_NTm10000_r75_rho1.pdf", p, width=9, height=7, units="in", dpi=600)
 
 
 ## Optimal T for fixed M
