@@ -12,9 +12,16 @@ source('optimal_design.R')
 
 shinyServer(function(input, output) {
   
+  Mselection <- reactive({
+    validate(
+      need(input$M%%2==0, "Number of subjects per cluster must be even")
+    )
+    input$M
+  })
+  
   getresults <- eventReactive(input$update, {
     
-    res <- optimal_N_T_fixedM(r=1-input$d, rho0=input$rho0, M=input$M,
+    res <- optimal_N_T_fixedM(r=1-input$d, rho0=input$rho0, Mselection(), # M=input$M,
                               maxN=input$maxN, B=input$B, c=input$c,
                               s=input$s, x=input$x)
     res$N <- as.integer(res$N)

@@ -31,10 +31,9 @@ shinyUI(fluidPage(
       
       h4("Trial configuration"),
       
-      # Input: Interval, number of subjects per cluster
-      sliderInput("M", "Number of subjects per cluster",
-                  min = 10, max = 5000,
-                  value = 100, step = 10),
+      # Input: Numeric, number of subjects per cluster
+      numericInput("M", "Number of subjects per cluster:",
+                  min = 2, max = 2000, value = 100, step=2),
       
       # Input: Interval, maximum number of clusters
       sliderInput("maxN", "Maximum number of clusters",
