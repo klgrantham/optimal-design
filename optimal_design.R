@@ -167,6 +167,12 @@ optimal_N_T_fixedM <- function(r, rho0, M, maxN, B, c, s, x){
     }
     vars <- vartheta_ind_vec(V, Xmats)
     underbudget$variance <- vars
+    underbudget$RE <- min(underbudget$variance)/underbudget$variance
+    # Save results to R data file
+    if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
+    rho0char <- strsplit(as.character(rho0),"\\.")[[1]][2]
+    save(underbudget, file=paste0("results/r", rchar, "_rho", rho0char, "_M",
+                                  M, "_maxN", maxN, "_c", c, "_s", s, "_x", x, ".Rda"))
     return(underbudget)
   }
 }
