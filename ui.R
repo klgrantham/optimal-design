@@ -45,22 +45,22 @@ shinyUI(fluidPage(
       h4("Cost components"),
       
       # Input: Interval, cost per cluster
-      sliderInput("c", "Cost per cluster",
+      numericInput("c", "Cost per cluster",
                   min = 100, max = 10000,
-                  value = 5000, step = 100),
+                  value = 2500, step = 100),
       
       # Input: Interval, cost per subject
-      sliderInput("s", "Cost per subject",
+      numericInput("s", "Cost per subject",
                   min = 100, max = 5000,
-                  value = 500, step = 100),
+                  value = 250, step = 50),
       
       # Input: Interval, cost per crossover
-      sliderInput("x", "Cost per crossover",
+      numericInput("x", "Cost per crossover",
                   min = 100, max = 5000,
-                  value = 400, step = 100),
+                  value = 250, step = 50),
       
       # Input: Interval, total budget
-      sliderInput("B", "Maximum trial budget",
+      numericInput("B", "Maximum trial budget",
                   min = 1000000, max = 10000000,
                   value = 2000000, step = 100000),
       
