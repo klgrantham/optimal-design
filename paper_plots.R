@@ -372,3 +372,163 @@ p <- ggplot(res, aes(x=Tp, y=N, color=factor(releffcat4))) +
   scale_x_log10(breaks=c(2,10,100,1000,2000), minor_breaks=NULL)
 ggsave("plots/rel_eff_M2000_r75_rho036_B5m.jpg", p, width=9, height=7, units="in", dpi=600)
 ggsave("plots/rel_eff_M2000_r75_rho036_B5m.pdf", p, width=9, height=7, units="in", dpi=600)
+
+
+
+## Optimal T for fixed M
+
+load("results/all_M_2000_N_40_r_75_rho_036.Rda"); res25N40 <- all
+load("results/all_M_2000_N_40_r_9_rho_036.Rda"); res10N40 <- all
+load("results/all_M_2000_N_40_r_5_rho_036.Rda"); res50N40 <- all
+load("results/all_M_2000_N_40_r_95_rho_036.Rda"); res5N40 <- all
+res25N40$releff <- min(res25N40$variance)/res25N40$variance
+res10N40$releff <- min(res10N40$variance)/res10N40$variance
+res50N40$releff <- min(res50N40$variance)/res50N40$variance
+res5N40$releff <- min(res5N40$variance)/res5N40$variance
+
+# Plot of variance versus T for several decay rates
+vars <- data.frame(Tp=res25N40$Tp,
+                   decay05=res5N40$variance, decay10=res10N40$variance,
+                   decay25=res25N40$variance, decay50=res50N40$variance)
+vars_long <- vars %>%
+  gather(key=decayrate, value=variance, -Tp, convert=TRUE)
+
+title <- expression(paste("Variance of treatment effect estimators, ", var(hat(theta))))
+subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036))
+
+p <- ggplot(data=vars_long, aes(x=Tp, y=variance, group=decayrate, color=decayrate)) +
+  geom_line(size=2.0) +
+  geom_point(size=2.5) +
+  scale_color_manual(values=colorRampPalette(c("lightblue", "darkblue"))(4),
+                     name="Correlation decay over trial",
+                     labels=c("5%", "10%", "25%", "50%")) +
+  xlab("Number of periods") +
+  ylab("Variance") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16),
+        legend.position="bottom") +
+  scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
+  scale_y_continuous(limits=c(0,0.00025))
+ggsave("plots/var_M2000_N40_r50_75_90_95_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/var_M2000_N40_r50_75_90_95_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+
+# Plot of relative efficiency versus T for several decay rates
+res5_10_25_50 <- data.frame(Tp=res25N40$Tp, 
+                            decay05=res5N40$releff, decay10=res10N40$releff,
+                            decay25=res25N40$releff, decay50=res50N40$releff)
+
+res5_10_25_50_long <- res5_10_25_50 %>%
+  gather(key=decayrate, value=relative_efficiency,
+         -Tp, convert=TRUE)
+
+title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
+subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036))
+
+p <- ggplot(data=res5_10_25_50_long, aes(x=Tp, y=relative_efficiency, group=decayrate, color=decayrate)) +
+  geom_line(size=2.0) +
+  geom_point(size=2.5) +
+  geom_hline(yintercept=1.0, size=1.0, color="black", linetype="longdash") +
+  scale_color_manual(values=colorRampPalette(c("lightblue", "darkblue"))(4),
+                     name="Correlation decay over trial",
+                     labels=c("5%", "10%", "25%", "50%")) +
+  xlab("Number of periods") +
+  ylab("Relative efficiency") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16),
+        legend.position="bottom") +
+  scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
+  scale_y_continuous(breaks=c(0,0.2,0.4,0.6,0.8,1.0), limits=c(0,1.0))
+ggsave("plots/rel_eff_M2000_N40_r50_75_90_95_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_N40_r50_75_90_95_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+
+# Plot of relative efficiency versus T for several decay rates, smaller cluster size
+load("results/all_M_200_N_40_r_75_rho_036.Rda"); res25N40 <- all
+load("results/all_M_200_N_40_r_9_rho_036.Rda"); res10N40 <- all
+load("results/all_M_200_N_40_r_5_rho_036.Rda"); res50N40 <- all
+load("results/all_M_200_N_40_r_95_rho_036.Rda"); res5N40 <- all
+res25N40$releff <- min(res25N40$variance)/res25N40$variance
+res10N40$releff <- min(res10N40$variance)/res10N40$variance
+res50N40$releff <- min(res50N40$variance)/res50N40$variance
+res5N40$releff <- min(res5N40$variance)/res5N40$variance
+
+res5_10_25_50 <- data.frame(Tp=res25N40$Tp, 
+                            decay05=res5N40$releff, decay10=res10N40$releff,
+                            decay25=res25N40$releff, decay50=res50N40$releff)
+
+res5_10_25_50_long <- res5_10_25_50 %>%
+  gather(key=decayrate, value=relative_efficiency,
+         -Tp, convert=TRUE)
+
+title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
+subtitle <- bquote(paste("40 clusters, 200 subjects in each cluster, ", rho==0.036))
+
+p <- ggplot(data=res5_10_25_50_long, aes(x=Tp, y=relative_efficiency, group=decayrate, color=decayrate)) +
+  geom_line(size=2.0) +
+  geom_point(size=2.5) +
+  geom_hline(yintercept=1.0, size=1.0, color="black", linetype="longdash") +
+  scale_color_manual(values=colorRampPalette(c("lightblue", "darkblue"))(4),
+                     name="Correlation decay over trial",
+                     labels=c("5%", "10%", "25%", "50%")) +
+  xlab("Number of periods") +
+  ylab("Relative efficiency") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16),
+        legend.position="bottom") +
+  scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
+  scale_y_continuous(breaks=c(0,0.2,0.4,0.6,0.8,1.0), limits=c(0,1.0))
+ggsave("plots/rel_eff_M200_N40_r50_75_90_95_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M200_N40_r50_75_90_95_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+
+# Plot of relative efficiency versus T for several decay rates, larger base correlation
+load("results/all_M_2000_N_40_r_75_rho_1.Rda"); res25N40 <- all
+load("results/all_M_2000_N_40_r_9_rho_1.Rda"); res10N40 <- all
+load("results/all_M_2000_N_40_r_5_rho_1.Rda"); res50N40 <- all
+load("results/all_M_2000_N_40_r_95_rho_1.Rda"); res5N40 <- all
+res25N40$releff <- min(res25N40$variance)/res25N40$variance
+res10N40$releff <- min(res10N40$variance)/res10N40$variance
+res50N40$releff <- min(res50N40$variance)/res50N40$variance
+res5N40$releff <- min(res5N40$variance)/res5N40$variance
+
+res5_10_25_50 <- data.frame(Tp=res25N40$Tp, 
+                            decay05=res5N40$releff, decay10=res10N40$releff,
+                            decay25=res25N40$releff, decay50=res50N40$releff)
+
+res5_10_25_50_long <- res5_10_25_50 %>%
+  gather(key=decayrate, value=relative_efficiency,
+         -Tp, convert=TRUE)
+
+title <- expression(paste("Relative efficiency of CRXO trial designs, ", var(hat(theta))[optimal]/var(hat(theta))))
+subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.1))
+
+p <- ggplot(data=res5_10_25_50_long, aes(x=Tp, y=relative_efficiency, group=decayrate, color=decayrate)) +
+  geom_line(size=2.0) +
+  geom_point(size=2.5) +
+  geom_hline(yintercept=1.0, size=1.0, color="black", linetype="longdash") +
+  scale_color_manual(values=colorRampPalette(c("lightblue", "darkblue"))(4),
+                     name="Correlation decay over trial",
+                     labels=c("5%", "10%", "25%", "50%")) +
+  xlab("Number of periods") +
+  ylab("Relative efficiency") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16),
+        legend.position="bottom") +
+  scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
+  scale_y_continuous(breaks=c(0,0.2,0.4,0.6,0.8,1.0), limits=c(0,1.0))
+ggsave("plots/rel_eff_M2000_N40_r50_75_90_95_rho1.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_N40_r50_75_90_95_rho1.pdf", p, width=9, height=7, units="in", dpi=600)
