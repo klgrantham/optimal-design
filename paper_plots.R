@@ -386,6 +386,25 @@ res10N40$releff <- min(res10N40$variance)/res10N40$variance
 res50N40$releff <- min(res50N40$variance)/res50N40$variance
 res5N40$releff <- min(res5N40$variance)/res5N40$variance
 
+# Plot of variance versus T for 25% decay
+title <- expression(paste("Variance of treatment effect estimator, ", var(hat(theta))))
+subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036))
+
+p <- ggplot(data=res25N40, aes(x=Tp, y=variance)) +
+  geom_line(size=2.0, color=colorRampPalette(c("lightblue", "darkblue"))(4)[3]) +
+  geom_point(size=2.5, color=colorRampPalette(c("lightblue", "darkblue"))(4)[3]) +
+  xlab("Number of periods") +
+  ylab("Variance") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=18),
+        plot.subtitle=element_text(hjust=0.5, size=18),
+        axis.title=element_text(size=16), axis.text=element_text(size=16)) +
+  scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) #+ # limits=c(0.5,2000)
+#  scale_y_continuous(limits=c(0,0.00025))
+ggsave("plots/var_M2000_N40_r75_rho036.jpg", p, width=9, height=6, units="in", dpi=600)
+ggsave("plots/var_M2000_N40_r75_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
+
 # Plot of variance versus T for several decay rates
 vars <- data.frame(Tp=res25N40$Tp,
                    decay05=res5N40$variance, decay10=res10N40$variance,
