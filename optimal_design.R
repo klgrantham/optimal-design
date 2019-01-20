@@ -133,6 +133,14 @@ optimal_N_T <- function(r, rho0, NTm){
 }
 
 total_cost <- function(N, Tp, M, c, s, x){
+  # Returns total trial cost, given:
+  #   - number of clusters, N
+  #   - number of periods, Tp
+  #   - cluster size, M
+  #   - cost per cluster, c
+  #   - cost per subject, s
+  #   - cost per crossover, x
+  
   B <- N*c + (N*M)*s + N*(Tp-1)*x
   return(B)
 }
