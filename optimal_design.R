@@ -9,6 +9,7 @@ library(dplyr)
 library(ggplot2)
 library(ltsa)
 library(numbers)
+library(viridis)
 
 desmat <- function(Tp, nclust){
   Xcrxo <- matrix(data=0, ncol=Tp, nrow=nclust)

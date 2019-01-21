@@ -262,27 +262,17 @@ ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho1.jpg", p, width=9, height=7, un
 ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho1.pdf", p, width=9, height=7, units="in", dpi=600)
 
 
-#
 # Plot relative efficiencies subject to budget constraint
+load("results/r77_rho036_M2000_maxN40_c2500_s50_x250.Rda"); rescosts <- underbudget
 
-res$releff <- min(res$variance)/res$variance
-cats <- cut(res$releff, breaks=c(0.0,0.30,0.60,0.90,0.95,0.99,1.0),
-            include.lowest=TRUE)
-newcats <- gsub(",", "-", cats, fixed=TRUE)
-res$releffcat4 <- gsub("\\(|\\]|\\[", "", newcats)
-color_paletteYGDB <-colorRampPalette(c( "yellow", "green", "darkblue"))(6)
-
-title <- expression(paste("Relative efficiency of CRXO trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
+title <- expression(paste("Relative efficiency of ICU trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
 subtitle <- bquote(paste(r==0.77, " , ", rho==0.036))
 
-p <- ggplot(res, aes(x=Tp, y=N, color=factor(releffcat4))) +
+p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
   geom_point(shape=16, size=5) +
-#  scale_colour_gradientn(colours=c("yellow", "green", "darkblue"),
-#                                   guide = "colourbar") +
-  scale_color_manual(values=color_paletteYGDB,
-                     name="Relative efficiency") +
-  xlab("T (number of periods)") +
-  ylab("N (number of clusters)") +
+  scale_color_viridis() +
+  xlab("Number of periods (T)") +
+  ylab("Number of clusters (N)") +
   labs(title=title, subtitle=subtitle) +
   theme_bw() +
   theme(plot.title=element_text(hjust=0.5, size=20),
@@ -290,5 +280,5 @@ p <- ggplot(res, aes(x=Tp, y=N, color=factor(releffcat4))) +
         axis.title=element_text(size=18), axis.text=element_text(size=18),
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
   scale_x_log10(breaks=c(2,10,100,1000,2000), minor_breaks=NULL)
-ggsave("plots/rel_eff_M2000_r77_rho036_B5m.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_M2000_r77_rho036_B5m.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=9, height=7, units="in", dpi=600)
