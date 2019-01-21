@@ -25,7 +25,7 @@ shinyUI(fluidPage(
       # Input: Interval, decay in correlation over trial
       sliderInput("d", "Decay in correlation over trial",
                   min = 0, max = 1,
-                  value = 0.25, step = 0.01),
+                  value = 0.23, step = 0.01),
       
       hr(),
       
@@ -33,12 +33,12 @@ shinyUI(fluidPage(
       
       # Input: Numeric, number of subjects per cluster
       numericInput("M", "Number of subjects per cluster:",
-                  min = 2, max = 2000, value = 100, step=2),
+                  min = 2, max = 2000, value = 2000, step=2),
       
       # Input: Interval, maximum number of clusters
       sliderInput("maxN", "Maximum number of clusters",
                   min = 10, max = 100,
-                  value = 100, step = 2),
+                  value = 40, step = 2),
       
       hr(),
       
@@ -52,7 +52,7 @@ shinyUI(fluidPage(
       # Input: Interval, cost per subject
       numericInput("s", "Cost per subject",
                   min = 100, max = 5000,
-                  value = 250, step = 50),
+                  value = 50, step = 50),
       
       # Input: Interval, cost per crossover
       numericInput("x", "Cost per crossover",
@@ -61,8 +61,8 @@ shinyUI(fluidPage(
       
       # Input: Interval, total budget
       numericInput("B", "Maximum trial budget",
-                  min = 1000000, max = 10000000,
-                  value = 2000000, step = 100000),
+                  min = 100000, max = 10000000,
+                  value = 2500000, step = 100000),
       
       # Update button to defer the rendering of output until user
       # clicks the button
