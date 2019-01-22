@@ -10,6 +10,35 @@ library(DT)
 
 source('optimal_design.R')
 
+releff_N_T <- function(r, rho0, M, maxN, B, c, s, x){
+  # Returns relative efficiencies for all possible numbers of clusters and periods
+  # for given:
+  #   - correlation values
+  #   - total trial budget
+  #   - cluster cost
+  #   - subject cost
+  #   - crossover cost
+  #   - number of subjects per cluster
+  #   _ maximum number of clusters
+  
+  Ns <- seq(2, maxN, 2) # all possible numbers of clusters
+  dM <- divisors(M)
+  Tps <- dM[dM %% 2 == 0] # all even divisors of M
+  # Determine combinations of N and T that stay within budget
+  all <- data.frame(N=rep(Ns, each=length(Tps)), Tp=rep(Tps, times=length(Ns)), cost=NA)
+  all$cost <- total_cost(all$N, all$Tp, M, c, s, x)
+  if(sum(all$cost <= B) == 0){
+    stop('No admissible designs within budget')
+  }else{
+    underbudget <- all[all$cost <= B,]
+    V <- contdecayVi(r=r, rho0=rho0, M=M)
+    Vi_inv <- TrenchInverse(V)
+    underbudget$variance <- mapply(vartheta, underbudget$N, underbudget$Tp, MoreArgs=list(Vi_inv=Vi_inv))
+    underbudget$RE <- min(underbudget$variance)/underbudget$variance
+    return(underbudget)
+  }
+}
+
 shinyServer(function(input, output) {
   
   Mselection <- reactive({
@@ -21,7 +50,7 @@ shinyServer(function(input, output) {
   
   getresults <- eventReactive(input$update, {
     
-    res <- optimal_N_T_fixedM(r=1-input$d, rho0=input$rho0, Mselection(), # M=input$M,
+    res <- releff_N_T(r=1-input$d, rho0=input$rho0, Mselection(),
                               maxN=input$maxN, B=input$B, c=input$c,
                               s=input$s, x=input$x)
     res$N <- as.integer(res$N)
