@@ -9,7 +9,6 @@ library(dplyr)
 library(ggplot2)
 library(ltsa)
 library(numbers)
-library(viridis)
 
 desmat <- function(Tp, nclust){
   Xcrxo <- matrix(data=0, ncol=Tp, nrow=nclust)
@@ -18,37 +17,20 @@ desmat <- function(Tp, nclust){
   return(Xcrxo)
 }
 
-vartheta_ind_vec <- function(Vi, Xmat){
-  # Calculates the variance of the treatment effect, theta, for a model at the
-  # individual level with a particular treatment schedule
-  #
-  # Inputs:
-  # Xmat - a vector of K x T matrices of the treatment schedule (note: all elements either 0 or 1)
-  # Vi - a Tm x Tm variance matrix for one cluster
-  
-  # All matrices are Toeplitz since we are assuming evenly-spaced times
-  Vi_inv <- TrenchInverse(Vi)
-  # Calculate variance using inverse covariance matrix for each design matrix
-  vars <- laply(Xmat, vartheta, Vi_inv)
-  return(vars)
-}
-
-vartheta <- function(Xmat, Vi_inv) {
+vartheta <- function(N, Tp, Vi_inv) {
   # Returns variance of treatment effect estimator for an inverse covariance
-  # matrix and a design matrix
+  # matrix and the dimensions of a design matrix
+  # Note: Assumes balanced CRXO design for faster computation
   
-  K <- nrow(Xmat)
-  Tp <- ncol(Xmat)
   m <- nrow(Vi_inv)/Tp
+  Xmat <- desmat(Tp, N)
   
   Q <- Xmat %x% t(rep(1,m))
-  B <- colSums(Xmat) %x% rep(1,m)
   C <- diag(Tp) %x% rep(1,m)
   term1 <- sum(diag(Q %*% Vi_inv %*% t(Q)))
-  term2 <- t(B) %*% Vi_inv %*% C
+  term2 <- (N/2) * colSums(Vi_inv) %*% C
   term3 <- solve(t(C) %*% Vi_inv %*% C)
-  term4 <- t(C) %*% Vi_inv %*% B
-  var <- 1/(term1 - (1/K)*term2 %*% term3 %*% term4)
+  var <- 1/(term1 - (1/N)*term2 %*% term3 %*% t(term2))
   return(var)
 }
 
@@ -162,20 +144,14 @@ optimal_N_T_fixedM <- function(r, rho0, M, maxN, B, c, s, x){
   Tps <- dM[dM %% 2 == 0] # all even divisors of M
   # Determine combinations of N and T that stay within budget
   all <- data.frame(N=rep(Ns, each=length(Tps)), Tp=rep(Tps, times=length(Ns)), cost=NA)
-  for (i in 1:dim(all)[1]){
-    all$cost[i] <- total_cost(all$N[i], all$Tp[i], M, c, s, x)
-  }
+  all$cost <- total_cost(all$N, all$Tp, M, c, s, x)
   if(sum(all$cost <= B) == 0){
     stop('No admissible designs within budget')
   }else{
     underbudget <- all[all$cost <= B,]
     V <- contdecayVi(r=r, rho0=rho0, M=M)
-    Xmats <- list()
-    for (i in 1:dim(underbudget)[1]){
-      Xmats[[i]] <- desmat(underbudget$Tp[i], underbudget$N[i])
-    }
-    vars <- vartheta_ind_vec(V, Xmats)
-    underbudget$variance <- vars
+    Vi_inv <- TrenchInverse(V)
+    underbudget$variance <- mapply(vartheta, underbudget$N, underbudget$Tp, MoreArgs=list(Vi_inv=Vi_inv))
     underbudget$RE <- min(underbudget$variance)/underbudget$variance
     # Save results to R data file
     if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
