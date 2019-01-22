@@ -3,6 +3,8 @@
 #
 # Kelsey Grantham (kelsey.grantham@monash.edu)
 
+library(viridis)
+
 source('optimal_design.R')
 
 ## Optimal T for fixed M
