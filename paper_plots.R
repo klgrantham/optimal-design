@@ -289,8 +289,8 @@ ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=9, height=7, units="
 # Plot relative efficiencies subject to budget and power constraints
 rescosts$power <- pow(vars=rescosts$variance, effsize=0.03, siglevel=0.05)
 
-title <- expression(paste("Relative efficiency of ICU trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
-subtitle <- bquote(paste("Power >=80% for effect size of 0.03, ", r==0.77, " , ", rho==0.036))
+title <- "Power of ICU trial designs to detect effect size of 0.03"
+subtitle <- bquote(paste("Power >=80%, ", r==0.77, " , ", rho==0.036))
 
 reskeep <- rescosts %>% filter(power>=0.80)
 p <- ggplot(reskeep, aes(x=Tp, y=N, color=power)) +
@@ -305,5 +305,5 @@ p <- ggplot(reskeep, aes(x=Tp, y=N, color=power)) +
         axis.title=element_text(size=18), axis.text=element_text(size=18),
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
   scale_x_log10(breaks=c(2,4,8,10,16,20,40,50,80,100), minor_breaks=NULL)
-ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m_ES03.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m_ES03.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/pow_M2000_r77_rho036_B2_5m_ES03.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/pow_M2000_r77_rho036_B2_5m_ES03.pdf", p, width=9, height=7, units="in", dpi=600)
