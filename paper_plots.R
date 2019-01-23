@@ -272,7 +272,7 @@ subtitle <- bquote(paste(r==0.77, " , ", rho==0.036))
 
 p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
   geom_point(shape=16, size=5) +
-  scale_color_viridis() +
+  scale_color_viridis(direction=-1) +
   xlab("Number of periods (T)") +
   ylab("Number of clusters (N)") +
   labs(title=title, subtitle=subtitle) +
@@ -281,6 +281,29 @@ p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
         plot.subtitle=element_text(hjust=0.5, size=20),
         axis.title=element_text(size=18), axis.text=element_text(size=18),
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
-  scale_x_log10(breaks=c(2,10,100,1000,2000), minor_breaks=NULL)
+  scale_x_log10(breaks=c(2,4,10,20,50,100,200,400,1000,2000), minor_breaks=NULL) # breaks=c(2,10,100,1000,2000)
 ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=9, height=7, units="in", dpi=600)
 ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=9, height=7, units="in", dpi=600)
+
+
+# Plot relative efficiencies subject to budget and power constraints
+rescosts$power <- pow(vars=rescosts$variance, effsize=0.03, siglevel=0.05)
+
+title <- expression(paste("Relative efficiency of ICU trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
+subtitle <- bquote(paste("Power >=80% for effect size of 0.03, ", r==0.77, " , ", rho==0.036))
+
+reskeep <- rescosts %>% filter(power>=0.80)
+p <- ggplot(reskeep, aes(x=Tp, y=N, color=power)) +
+  geom_point(shape=16, size=5) +
+  scale_color_viridis(direction=-1) +
+  xlab("Number of periods (T)") +
+  ylab("Number of clusters (N)") +
+  labs(title=title, subtitle=subtitle) +
+  theme_bw() +
+  theme(plot.title=element_text(hjust=0.5, size=20),
+        plot.subtitle=element_text(hjust=0.5, size=20),
+        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        legend.title=element_text(size=16), legend.text=element_text(size=16)) +
+  scale_x_log10(breaks=c(2,4,8,10,16,20,40,50,80,100), minor_breaks=NULL)
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m_ES03.jpg", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m_ES03.pdf", p, width=9, height=7, units="in", dpi=600)

@@ -161,3 +161,9 @@ optimal_N_T_fixedM <- function(r, rho0, M, maxN, B, c, s, x){
     return(underbudget)
   }
 }
+
+pow <- function(vars, effsize, siglevel=0.05){
+  z <- qnorm(siglevel/2)
+  pow <- pnorm(z + sqrt(1/vars)*effsize)
+  return(pow)
+}
