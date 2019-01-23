@@ -10,6 +10,30 @@ library(DT)
 
 source('optimal_design.R')
 
+desmat_alt <- function(Tp, nclust){
+  # Uses alternative coding of treatment sequences
+  # (Xij=-1 for Control and Xij=1 for Intervention)
+  Xcrxo <- matrix(data=-1, ncol=Tp, nrow=nclust)
+  Xcrxo[1:nclust/2, seq(1,Tp,2)] <- 1
+  Xcrxo[(nclust/2 + 1):nclust, seq(2,Tp,2)] <- 1
+  return(Xcrxo)
+}
+
+vartheta_alt <- function(N, Tp, Vi_inv) {
+  # Returns variance of treatment effect estimator for an inverse covariance
+  # matrix and the dimensions of a design matrix
+  # Note: Assumes balanced CRXO design for faster computation
+  # Uses alternative coding of treatment sequences of {-1,1}
+  
+  m <- nrow(Vi_inv)/Tp
+  Xmat <- desmat_alt(Tp, N)
+  
+  Q <- Xmat %x% t(rep(1,m))
+  term1 <- sum(diag(Q %*% Vi_inv %*% t(Q)))
+  var <- 4/term1 # Scale by 4 for equivalence to {0,1} parameterization
+  return(var)
+}
+
 releff_N_T <- function(r, rho0, M, maxN, B, c, s, x){
   # Returns relative efficiencies for all possible numbers of clusters and periods
   # for given:
@@ -33,7 +57,7 @@ releff_N_T <- function(r, rho0, M, maxN, B, c, s, x){
     underbudget <- all[all$cost <= B,]
     V <- contdecayVi(r=r, rho0=rho0, M=M)
     Vi_inv <- TrenchInverse(V)
-    underbudget$variance <- mapply(vartheta, underbudget$N, underbudget$Tp, MoreArgs=list(Vi_inv=Vi_inv))
+    underbudget$variance <- mapply(vartheta_alt, underbudget$N, underbudget$Tp, MoreArgs=list(Vi_inv=Vi_inv))
     underbudget$RE <- min(underbudget$variance)/underbudget$variance
     return(underbudget)
   }
