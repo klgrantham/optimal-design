@@ -98,7 +98,10 @@ shinyServer(function(input, output) {
                  text=~paste("T: ", Tp, "<br>N: ", N,
                              "<br>Relative efficiency: ", format(RE, digits=3),
                              "<br>Cost: ", paste0("$", comma(cost))),
-                 color=~RE, marker=list(size=14)) %>%
+                 hoverlabel=list(bgcolor='white', bordercolor=NULL, font=list(size=16)),
+                 marker=list(size=14, color=~RE, colorscale='Viridis', reversescale=T,
+                             colorbar=list(title="Relative<br>efficiency", lenmode='fraction', len=0.5))
+          ) %>%
          layout(xaxis=list(title="Number of periods (T)", titlefont=list(size=18), tickfont=list(size=16), type=type),
                 yaxis=list(title="Number of clusters (N)", titlefont=list(size=18), tickfont=list(size=16)))
     p$elementId <- NULL # Workaround to suppress warning due to an incompatility between shiny and plotly
