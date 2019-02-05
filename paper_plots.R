@@ -13,7 +13,7 @@ load("results/all_M_2000_N_40_r_77_rho_036.Rda"); res23N40 <- all
 
 # Plot of variance versus T for 23% decay
 title <- expression(paste("Variance of treatment effect estimator, ", Var(hat(theta))))
-subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036))
+subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036, ", ", r==0.77))
 
 p <- ggplot(data=res23N40, aes(x=Tp, y=variance)) +
   geom_line(size=2.0, color=colorRampPalette(c("lightblue", "darkblue"))(4)[3]) +
@@ -35,7 +35,7 @@ ggsave("plots/var_M2000_N40_r77_rho036.pdf", p, width=9, height=6, units="in", d
 load("results/all_M_200_N_40_r_77_rho_036.Rda"); res23M200N40 <- all
 
 title <- expression(paste("Variance of treatment effect estimator, ", Var(hat(theta))))
-subtitle <- bquote(paste("40 clusters, 200 subjects in each cluster, ", rho==0.036))
+subtitle <- bquote(paste("40 clusters, 200 subjects in each cluster, ", rho==0.036, ", ", r==0.77))
 
 p <- ggplot(data=res23M200N40, aes(x=Tp, y=variance)) +
   geom_line(size=2.0, color=colorRampPalette(c("lightblue", "darkblue"))(4)[3]) +
@@ -84,8 +84,8 @@ p <- ggplot(data=vars_rho_01_036_1_2_long, aes(x=Tp, y=variance, group=rho, colo
         legend.position="bottom") +
   scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
   scale_y_continuous(limits=c(0,0.0004))
-ggsave("plots/var_M2000_N40_r77_rho01_036_1_2.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/var_M2000_N40_r77_rho01_036_1_2.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/var_M2000_N40_r77_rho01_036_1_2.jpg", p, width=9, height=6, units="in", dpi=600)
+ggsave("plots/var_M2000_N40_r77_rho01_036_1_2.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
 # Plot of variance versus T for several decay rates
@@ -99,7 +99,7 @@ vars <- data.frame(Tp=res23N40$Tp,
 vars_long <- vars %>%
   gather(key=decayrate, value=variance, -Tp, convert=TRUE)
 
-title <- expression(paste("Variance of treatment effect estimators, ", Var(hat(theta))))
+title <- expression(paste("Variance of treatment effect estimator, ", Var(hat(theta))))
 subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036))
 
 p <- ggplot(data=vars_long, aes(x=Tp, y=variance, group=decayrate, color=decayrate)) +
@@ -119,8 +119,8 @@ p <- ggplot(data=vars_long, aes(x=Tp, y=variance, group=decayrate, color=decayra
         legend.position="bottom") +
   scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
   scale_y_continuous(limits=c(0,0.00025))
-ggsave("plots/var_M2000_N40_r50_77_90_95_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/var_M2000_N40_r50_77_90_95_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/var_M2000_N40_r50_77_90_95_rho036.jpg", p, width=9, height=6, units="in", dpi=600)
+ggsave("plots/var_M2000_N40_r50_77_90_95_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
 # Plot of relative efficiency versus T
@@ -142,8 +142,8 @@ p <- ggplot(data=res23N40, aes(x=Tp, y=releff)) +
         axis.title=element_text(size=18), axis.text=element_text(size=18)) +
   scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
   scale_y_continuous(breaks=c(0,0.2,0.4,0.6,0.8,1.0), limits=c(0,1.0))
-ggsave("plots/rel_eff_M2000_N40_r77_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_M2000_N40_r77_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_N40_r77_rho036.jpg", p, width=9, height=6, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_N40_r77_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
 # Plot of relative efficiency versus T for several decay rates
@@ -268,7 +268,7 @@ ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho1.pdf", p, width=9, height=7, un
 load("results/r77_rho036_M2000_maxN40_c2500_s50_x250.Rda"); rescosts <- underbudget
 
 title <- expression(paste("Relative efficiency of ICU trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
-subtitle <- bquote(paste(r==0.77, " , ", rho==0.036))
+subtitle <- bquote(paste("2,000 subjects in each cluster, ", rho==0.036, " , ", r==0.77))
 
 p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
   geom_point(shape=16, size=5) +
