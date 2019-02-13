@@ -279,11 +279,12 @@ p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
   theme_bw() +
   theme(plot.title=element_text(hjust=0.5, size=20),
         plot.subtitle=element_text(hjust=0.5, size=20),
-        axis.title=element_text(size=18), axis.text=element_text(size=18),
+        axis.title=element_text(size=18), axis.text=element_text(size=14),
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
-  scale_x_log10(breaks=c(2,4,10,20,50,100,200,400,1000,2000), minor_breaks=NULL) # breaks=c(2,10,100,1000,2000)
-ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=9, height=7, units="in", dpi=600)
+  scale_x_log10(breaks=c(2,4,8,10,16,20,40,50,100,200,400,1000,2000), minor_breaks=NULL) + # breaks=c(2,10,100,1000,2000)
+  scale_y_continuous(breaks=c(4,8,12,16,20,24))
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=10, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=10, height=7, units="in", dpi=600)
 
 
 # Plot relative efficiencies subject to budget and power constraints
