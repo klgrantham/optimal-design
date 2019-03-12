@@ -159,7 +159,7 @@ res5_10_23_50_long <- res5_10_23_50 %>%
   gather(key=decayrate, value=relative_efficiency,
          -Tp, convert=TRUE)
 
-title <- expression(paste("Relative efficiency of CRXO trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
+title <- expression(paste("Relative efficiency, ", Var(hat(theta))[optimal]/Var(hat(theta))))
 subtitle <- bquote(paste("40 clusters, 2,000 subjects in each cluster, ", rho==0.036))
 
 p <- ggplot(data=res5_10_23_50_long, aes(x=Tp, y=relative_efficiency, group=decayrate, color=decayrate)) +
@@ -180,8 +180,8 @@ p <- ggplot(data=res5_10_23_50_long, aes(x=Tp, y=relative_efficiency, group=deca
         legend.position="bottom") +
   scale_x_log10(breaks=c(2,4,8,10,20,50,100,200,500,1000,2000), minor_breaks=NULL) +
   scale_y_continuous(breaks=c(0,0.2,0.4,0.6,0.8,1.0), limits=c(0,1.0))
-ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho036.jpg", p, width=9, height=7, units="in", dpi=600)
-ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho036.pdf", p, width=9, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho036.jpg", p, width=9, height=6, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 # Plot of relative efficiency versus T for several decay rates, smaller cluster size
 res23M200N40$releff <- min(res23M200N40$variance)/res23M200N40$variance
@@ -283,7 +283,7 @@ p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
   scale_x_log10(breaks=c(2,4,8,10,16,20,40,50,100,200,400,1000,2000), minor_breaks=NULL) + # breaks=c(2,10,100,1000,2000)
   scale_y_continuous(breaks=c(4,8,12,16,20,24))
-ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=10, height=7, units="in", dpi=600)
+ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=10, height=7, units="in", dpi=500)
 ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=10, height=7, units="in", dpi=600)
 
 
