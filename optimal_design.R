@@ -10,10 +10,12 @@ library(ggplot2)
 library(ltsa)
 library(numbers)
 
-desmat <- function(Tp, nclust){
-  Xcrxo <- matrix(data=0, ncol=Tp, nrow=nclust)
-  Xcrxo[1:nclust/2, seq(1,Tp,2)] <- 1
-  Xcrxo[(nclust/2 + 1):nclust, seq(2,Tp,2)] <- 1
+desmat <- function(Tp, N){
+  # Generates design matrix for a balanced CRXO design with
+  # N clusters and Tp periods
+  Xcrxo <- matrix(data=0, ncol=Tp, nrow=N)
+  Xcrxo[1:N/2, seq(1,Tp,2)] <- 1
+  Xcrxo[(N/2 + 1):N, seq(2,Tp,2)] <- 1
   return(Xcrxo)
 }
 
@@ -52,18 +54,6 @@ contdecayVi <- function(r, M, rho0){
   return(Vi)
 }
 
-## For different rates of decay, how different are the
-## gains in precision going from T=2 to T=4?
-
-vars_doubling <- function(rs, M){
-  Xmats <- list(desmat(2,2), desmat(4,2), desmat(8,2), desmat(16,2), desmat(32,2))
-  ctvarmat <- llply(rs, contdecayVi, M, 0.035)
-  ctres <- laply(ctvarmat, vartheta_ind_vec, Xmat=Xmats)
-  varvals <- data.frame(decay=1-rs, varT2=ctres[,1], varT4=ctres[,2],
-                        varT8=ctres[,3], varT16=ctres[,4], varT32=ctres[,5])
-  return(varvals)
-}
-
 optimal_T <- function(r, rho0, M, N){
   # Returns optimal number of periods (giving lowest variance)
   # for specified correlation values, number of subjects
@@ -85,36 +75,6 @@ optimal_T <- function(r, rho0, M, N){
   return(list(opt=optimal, all=all))
 }
 
-optimal_N_T <- function(r, rho0, NTm){
-  # Returns optimal number of clusters and periods
-  # (giving lowest variance) for specified correlation values,
-  # number of subjects in trial.
-
-  d <- divisors(NTm)
-  # Take only even N values from divisors of NTm
-  Ns <- d[which(d %% 2 == 0 & d != NTm)]
-  res <- list()
-  for (i in 1:length(Ns)) {
-    N <- Ns[i]
-    M <- NTm/N
-    V <- contdecayVi(r=r, rho0=rho0, M=M)
-    # Must have even T>=2 even and m>=1
-    # Possible values of T will be all even divisors of each M
-    dM <- divisors(M)
-    Tps <- dM[dM %% 2 == 0]
-    Xmats <- llply(Tps, desmat, N)
-    vars <- vartheta_ind_vec(V, Xmats)
-    res[[i]] <- cbind(rep(N, length(Tps)), Tps, vars)
-  }
-  resblock <- do.call("rbind", res)
-  all <- data.frame(N=resblock[,1], T=resblock[,2], variance=resblock[,3])
-  if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
-  rho0char <- strsplit(as.character(rho0),"\\.")[[1]][2]
-  save(all, file=paste0("results/all_NTm_", NTm, "_r_", rchar, "_rho_", rho0char, ".Rda"))
-  optimal <- all[which.min(all$variance),]
-  return(list(opt=optimal, all=all))
-}
-
 total_cost <- function(N, Tp, M, c, s, x){
   # Returns total trial cost, given:
   #   - number of clusters, N
@@ -131,13 +91,14 @@ total_cost <- function(N, Tp, M, c, s, x){
 optimal_N_T_fixedM <- function(r, rho0, M, maxN, B, c, s, x){
   # Returns optimal number of clusters and periods
   # (giving lowest variance) for given:
-  #   - correlation values
-  #   - total trial budget
-  #   - cluster cost
-  #   - subject cost
-  #   - crossover cost
-  #   - number of subjects per cluster
-  #   _ maximum number of clusters
+  #   - proportionate decay in correlation, r
+  #   - base correlation, rho0
+  #   - total number of subjects per cluster, M
+  #   - maximum number of clusters, maxN
+  #   - total trial budget, B
+  #   - cluster cost, c
+  #   - subject cost, s
+  #   - crossover cost, x
   
   Ns <- seq(2, maxN, 2) # all possible numbers of clusters
   dM <- divisors(M)
@@ -151,7 +112,8 @@ optimal_N_T_fixedM <- function(r, rho0, M, maxN, B, c, s, x){
     underbudget <- all[all$cost <= B,]
     V <- contdecayVi(r=r, rho0=rho0, M=M)
     Vi_inv <- TrenchInverse(V)
-    underbudget$variance <- mapply(vartheta, underbudget$N, underbudget$Tp, MoreArgs=list(Vi_inv=Vi_inv))
+    underbudget$variance <- mapply(vartheta, underbudget$N, underbudget$Tp,
+                                   MoreArgs=list(Vi_inv=Vi_inv))
     underbudget$RE <- min(underbudget$variance)/underbudget$variance
     # Save results to R data file
     if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
