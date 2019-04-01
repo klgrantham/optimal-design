@@ -7,7 +7,7 @@ library(viridis)
 
 source('optimal_design.R')
 
-# Plot of variance versus T for several decay rates
+# Figure 3: Variance versus T for several decay rates
 load("results/all_M_2000_N_40_r_77_rho_036.Rda"); res23N40 <- all
 load("results/all_M_2000_N_40_r_9_rho_036.Rda"); res10N40 <- all
 load("results/all_M_2000_N_40_r_5_rho_036.Rda"); res50N40 <- all
@@ -43,7 +43,7 @@ ggsave("plots/var_M2000_N40_r50_77_90_95_rho036.jpg", p, width=9, height=6, unit
 ggsave("plots/var_M2000_N40_r50_77_90_95_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
-# Plot of relative efficiency versus T for several decay rates
+# Figure 4: Relative efficiency versus T for several decay rates
 res23N40$releff <- min(res23N40$variance)/res23N40$variance
 res10N40$releff <- min(res10N40$variance)/res10N40$variance
 res50N40$releff <- min(res50N40$variance)/res50N40$variance
@@ -82,7 +82,7 @@ ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho036.jpg", p, width=9, height=6, 
 ggsave("plots/rel_eff_M2000_N40_r50_77_90_95_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
-# Plot relative efficiencies subject to budget constraint
+# Figure 5: Relative efficiencies subject to budget constraint
 load("results/r77_rho036_M2000_maxN40_c2500_s50_x250.Rda"); rescosts <- underbudget
 
 title <- expression(paste("Relative efficiency of ICU trial designs, ", Var(hat(theta))[optimal]/Var(hat(theta))))
@@ -99,13 +99,13 @@ p <- ggplot(rescosts, aes(x=Tp, y=N, color=RE)) +
         plot.subtitle=element_text(hjust=0.5, size=20),
         axis.title=element_text(size=18), axis.text=element_text(size=14),
         legend.title=element_text(size=16), legend.text=element_text(size=16)) +
-  scale_x_log10(breaks=c(2,4,8,10,16,20,40,50,100,200,400,1000,2000), minor_breaks=NULL) + # breaks=c(2,10,100,1000,2000)
+  scale_x_log10(breaks=c(2,4,8,10,16,20,40,50,100,200,400,1000,2000), minor_breaks=NULL)
   scale_y_continuous(breaks=c(4,8,12,16,20,24))
 ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=10, height=7, units="in", dpi=500)
 ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=10, height=7, units="in", dpi=600)
 
 
-# Plot of variance versus T, smaller cluster size
+# Figure A1: Variance versus T, smaller cluster size
 load("results/all_M_200_N_40_r_77_rho_036.Rda"); res23M200N40 <- all
 
 title <- expression(paste("Variance of treatment effect estimator, ", Var(hat(theta))))
@@ -127,7 +127,7 @@ ggsave("plots/var_M200_N40_r77_rho036.jpg", p, width=9, height=6, units="in", dp
 ggsave("plots/var_M200_N40_r77_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
-# Plot of variance versus T for several base correlation values
+# Figure A2: Variance versus T for several base correlation values
 load("results/all_M_2000_N_40_r_77_rho_01.Rda"); res23rho01N40 <- all
 load("results/all_M_2000_N_40_r_77_rho_1.Rda"); res23rho1N40 <- all
 load("results/all_M_2000_N_40_r_77_rho_2.Rda"); res23rho2N40 <- all
