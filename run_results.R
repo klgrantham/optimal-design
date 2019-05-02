@@ -21,7 +21,7 @@ optimal_N_T_fixedM(r=0.77, rho0=0.036, M=2000, maxN=40, B=2500000, c=2500, s=50,
 # Variance results for smaller cluster size (Figure 6)
 optimal_T(r=0.77, rho0=0.036, M=200, N=40)
 
-# Variance results for several base correlation values
+# Variance results for several base correlation values (Figure 7)
 optimal_T(r=0.77, rho0=0.01, M=2000, N=40)
 optimal_T(r=0.77, rho0=0.1, M=2000, N=40)
 optimal_T(r=0.77, rho0=0.2, M=2000, N=40)
