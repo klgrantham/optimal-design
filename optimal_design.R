@@ -42,7 +42,7 @@ contdecayVi <- function(r, M, rho0){
   #
   # Inputs:
   # r - 1-rate of decay over entire trial
-  # M - total number of subjects each cluster
+  # M - total number of subjects in each cluster
   # rho0 - base correlation between subjects measured at same time
   
   totalvar <- 1
@@ -58,15 +58,17 @@ optimal_T <- function(r, rho0, M, N){
   # Returns optimal number of periods (giving lowest variance)
   # for specified correlation values, number of subjects
   # in a cluster, M, and number of clusters, N (even).
+  # Also saves results for all configurations
   
   d <- divisors(M)
   # Take only even T>=2 from divisors of M
   Tps <- d[d>=2 & d %% 2 == 0]
   # Generate covariance matrix for a cluster
   V <- contdecayVi(r=r, rho0=rho0, M=M)
-  # Generate design matrices for all values of T
-  Xmats <- llply(Tps, desmat, N)
-  vars <- vartheta_ind_vec(V, Xmats)
+  # All matrices are Toeplitz since we are assuming evenly-spaced times
+  Vi_inv <- TrenchInverse(V)
+  # Calculate variances
+  vars <- mapply(vartheta, N, Tps, MoreArgs=list(Vi_inv=Vi_inv))
   all <- data.frame(Tp=Tps, variance=vars)
   if(r==1){rchar <- 100}else{rchar <- strsplit(as.character(r),"\\.")[[1]][2]}
   rho0char <- strsplit(as.character(rho0),"\\.")[[1]][2]
