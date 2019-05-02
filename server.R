@@ -37,14 +37,15 @@ vartheta_alt <- function(N, Tp, Vi_inv) {
 releff_N_T <- function(r, rho0, M, maxN, B, c, s, x){
   # Returns relative efficiencies for all possible numbers of clusters and periods
   # for given:
-  #   - correlation values
-  #   - total trial budget
-  #   - cluster cost
-  #   - subject cost
-  #   - crossover cost
-  #   - number of subjects per cluster
-  #   _ maximum number of clusters
-  
+  #   - proportionate decay in correlation, r
+  #   - base correlation, rho0
+  #   - total number of subjects per cluster, M
+  #   - maximum number of clusters, maxN
+  #   - total trial budget, B
+  #   - cluster cost, c
+  #   - subject cost, s
+  #   - crossover cost, x
+
   Ns <- seq(2, maxN, 2) # all possible numbers of clusters
   dM <- divisors(M)
   Tps <- dM[dM %% 2 == 0] # all even divisors of M
