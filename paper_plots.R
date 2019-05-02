@@ -7,6 +7,11 @@ library(viridis)
 
 source('optimal_design.R')
 
+# Create plots directory if no such directory exists
+if (!dir.exists('plots')) {
+  dir.create('plots')
+}
+
 # Figure 3: Variance versus T for several decay rates
 load("results/all_M_2000_N_40_r_77_rho_036.Rda"); res23N40 <- all
 load("results/all_M_2000_N_40_r_9_rho_036.Rda"); res10N40 <- all
@@ -105,7 +110,7 @@ ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.jpg", p, width=10, height=7, units=
 ggsave("plots/rel_eff_M2000_r77_rho036_B2_5m.pdf", p, width=10, height=7, units="in", dpi=600)
 
 
-# Figure A1: Variance versus T, smaller cluster size
+# Figure 6: Variance versus T, smaller cluster size
 load("results/all_M_200_N_40_r_77_rho_036.Rda"); res23M200N40 <- all
 
 title <- expression(paste("Variance of treatment effect estimator, ", Var(hat(theta))))
@@ -127,7 +132,7 @@ ggsave("plots/var_M200_N40_r77_rho036.jpg", p, width=9, height=6, units="in", dp
 ggsave("plots/var_M200_N40_r77_rho036.pdf", p, width=9, height=6, units="in", dpi=600)
 
 
-# Figure A2: Variance versus T for several base correlation values
+# Figure 7: Variance versus T for several base correlation values
 load("results/all_M_2000_N_40_r_77_rho_01.Rda"); res23rho01N40 <- all
 load("results/all_M_2000_N_40_r_77_rho_1.Rda"); res23rho1N40 <- all
 load("results/all_M_2000_N_40_r_77_rho_2.Rda"); res23rho2N40 <- all
